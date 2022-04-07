@@ -9,8 +9,6 @@ import re
 
 threadLock = threading.Lock()
 
-print("USING LOCAL QUERYMAGIC")
-
 class QueryResult:
     def __init__(self, type=None, query=None, result=None):
         self.__type = type
