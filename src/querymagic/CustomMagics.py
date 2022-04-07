@@ -81,7 +81,7 @@ class QueryMagic(Magics):
             try:
                 result = splunk_execute(substituted_string)
             except Exception as e:
-                print(e)
+                print("ERROR:",e)
                 return
 
             global _last_query_result
@@ -101,7 +101,7 @@ class QueryMagic(Magics):
             try:
                 result = kusto_execute(substituted_string)
             except Exception as e:
-                print(e)
+                print("ERROR:",e)
                 return
 
             global _last_query_result
