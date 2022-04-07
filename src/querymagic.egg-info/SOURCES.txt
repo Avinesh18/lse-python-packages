@@ -2,8 +2,8 @@ LICENSE
 pyproject.toml
 setup.cfg
 src/querymagic/CustomMagics.py
-src/querymagic/FetchResult.py
 src/querymagic/FormatResponse.py
+src/querymagic/Kusto.py
 src/querymagic/Splunk.py
 src/querymagic/Util.py
 src/querymagic/__init__.py
