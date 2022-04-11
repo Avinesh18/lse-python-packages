@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: querymagic
-Version: 0.2.0
+Version: 0.3.3
 Summary: Query Magic
 Home-page: https://github.com/Avinesh18/lse-python-packages
 Author: avinesh18
@@ -15,5 +15,16 @@ Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-UNKNOWN
+## Querymagic
+Use querymagic to write Splunk and Kusto queries in your Jupyter notebooks.
+
+It needs following environment variables:
+
+- SPLUNK_TOKEN
+- SPLUNK_SEARCH_URL
+- KUSTO_CLIENT_ID
+- KUSTO_CLIENT_SECRET
+- KUSTO_TENANT_ID
+
+The package queries `Insights` database for kusto queries. This detail is hardcoded.
 
