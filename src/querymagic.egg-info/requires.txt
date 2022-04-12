@@ -3,3 +3,4 @@ pandas
 requests
 azure-kusto-data
 matplotlib
+numpy

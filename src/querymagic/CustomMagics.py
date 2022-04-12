@@ -1,3 +1,4 @@
+import os
 from IPython.core.magic import register_cell_magic, Magics, magics_class, cell_magic, needs_local_scope
 from IPython.display import display
 from .Splunk import execute as splunk_execute
@@ -75,7 +76,8 @@ class QueryMagic(Magics):
     @cell_magic
     def splunk(self, line, cell, local_ns = None):
         parameters = parse_parameters(line)
-        parameters['filename'] = local_ns['__file__'].split('.')[0]
+        parameters['filename'] = os.getenv('QUERYMAGIC_FILENAME')
+        parameters['filename'] = parameters['filename'] if parameters['filename'] != None else 'querymagic-image'
         substituted_string = add_substitutions(cell, local_ns)
         try:
             threadLock.acquire()
@@ -88,7 +90,7 @@ class QueryMagic(Magics):
             global _last_query_result
             _last_query_result._set("splunk", substituted_string, result)
 
-            display(formatResponse(result, parameters))
+            formatResponse(result, parameters)
         finally:
             threadLock.release()
 
@@ -96,7 +98,8 @@ class QueryMagic(Magics):
     @cell_magic
     def kusto(self, line, cell, local_ns = None):
         parameters = parse_parameters(line)
-        parameters['filename'] = local_ns['__file__'].split('.')[0]
+        parameters['filename'] = os.getenv('QUERYMAGIC_FILENAME')
+        parameters['filename'] = parameters['filename'] if parameters['filename'] != None else 'querymagic-image'
         substituted_string = add_substitutions(cell, local_ns)
         try:
             threadLock.acquire()
@@ -110,7 +113,7 @@ class QueryMagic(Magics):
             _last_query_result._set("kusto", substituted_string, result)
 
             for i in range(len(result)):
-                display(formatResponse(result[i], parameters))
+                formatResponse(result[i], parameters)
         finally:
             threadLock.release()
 

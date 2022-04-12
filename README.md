@@ -10,5 +10,3 @@ It needs following environment variables:
 - KUSTO_TENANT_ID
 
 The package queries `Insights` database for kusto queries. This detail is hardcoded.
-
-This package can only be used in `.ipynb` files with `ipython` command
