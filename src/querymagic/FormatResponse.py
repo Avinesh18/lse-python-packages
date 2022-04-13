@@ -13,7 +13,7 @@ def dataframeToImage(df, options):
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
     table(ax, df, loc='center')
-    plt.savefig(options['filename'] + ".png")
+    plt.savefig(options['filename'] + ".png", bbox_inches = 'tight')
 
 def validDateString(string):
     try:
@@ -111,9 +111,8 @@ def plotChartAndSaveToFile(result, options):
     
     plt.figure(figsize = (10, 5), dpi = 80)
     plt.xticks(rotation=70)
-    plt.xticks(rotation=70)
     plt.plot(x_series, y_series)
-    plt.savefig(options['filename'] + ".png")
+    plt.savefig(options['filename'] + ".png", bbox_inches = 'tight')
 
 def formatResponse(result, options):
     
