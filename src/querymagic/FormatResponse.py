@@ -1,14 +1,12 @@
-import pandas
-import matplotlib.pyplot as plt
-from matplotlib.dates import datestr2num
-from pandas.plotting import table
-from IPython.display import display
-import numpy as np
-from dateutil.parser import parse
 import re
+import pandas
+import numpy as np
+from IPython.display import display
+from dateutil.parser import parse
+import matplotlib.pyplot as plt
+from pandas.plotting import table
 
 def dataframeToImage(df, options):
-    plt.figure(figsize = (10, 5), dpi = 80)
     ax = plt.subplot(111, frame_on=False)
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
@@ -20,7 +18,7 @@ def dataframeToImage(df, options):
     cells = df_table.get_celld()
     for cell_loc in cells:
         cells[cell_loc].set_text_props(verticalalignment = 'center', horizontalalignment = 'center')
-        
+
     plt.savefig(options['filename'] + ".png", bbox_inches = 'tight')
 
 def validDateString(string):
@@ -75,9 +73,7 @@ def formatDataSeries(data, type, allow_string):
     if type == None:
         type = findType(data)
     
-    if type == 'real':
-        data = formatRealDataSeries(data)
-    elif type == 'bool':
+    if type == 'boolean':
         type = 'bool'
     elif type == 'date' or type == 'timespan' or type == 'time':
         type = 'datetime'
@@ -87,7 +83,9 @@ def formatDataSeries(data, type, allow_string):
     if type == 'string' and not(allow_string):
         raise Exception('cannot plot this type of data')
 
-    if type == 'bool':
+    if type == 'real':
+        data = formatRealDataSeries(data)
+    elif type == 'bool':
         data = formatBoolDataSeries(data)
     elif type == 'datetime':
         data = formatDateTimeDataSeries(data)
@@ -99,9 +97,8 @@ def formatRowsAndColumnsForPlotting(result, x_field, y_field):
     y_field_index = np.where(result['columns'] == y_field)[0][0]
     x_series = result['rows'][:, x_field_index]
     y_series = result['rows'][:, y_field_index]
-
-    x_series = formatDataSeries(x_series, None if not('column_type' in result) else result['column_types'][x_field_index], True)
-    y_series = formatDataSeries(y_series, None if not('column_type' in result) == 'NoneType' else result['column_types'][y_field_index], False)
+    x_series = formatDataSeries(x_series, None if type(result['column_types']).__name__ == 'NoneType' else result['column_types'][x_field_index], True)
+    y_series = formatDataSeries(y_series, None if type(result['column_types']).__name__ == 'NoneType' else result['column_types'][y_field_index], False)
     return (x_series, y_series)
 
 def plotChartAndSaveToFile(result, options):
@@ -119,12 +116,26 @@ def plotChartAndSaveToFile(result, options):
     
     plt.figure(figsize = (10, 5), dpi = 80)
     plt.xticks(rotation=70)
-    plt.plot(x_series, y_series)
+    plt.grid(axis='y')
+
+    if chart_type == 'barchart':
+        plt.bar(x_series, y_series)
+    elif chart_type == 'piechart':
+        plt.pie(y_series, labels=x_series, startangle=90, autopct='%.1f%%')
+    elif chart_type == 'scatterplot':
+        plt.scatter(x_series, y_series)
+    else:
+        plt.plot(x_series, y_series)
+
     plt.savefig(options['filename'] + ".png", bbox_inches = 'tight')
 
 def formatResponse(result, options):
+    print(options)
     
-    if not('out' in options) or options['out'] == 'table':
+    if not('out' in options):
+        display(pandas.DataFrame(result['rows'], columns = result['columns']))
+
+    elif options['out'] == 'table':
         dataframeToImage(pandas.DataFrame(result['rows'], columns = result['columns']), options)
 
     elif options['out'] == "raw":
@@ -132,9 +143,6 @@ def formatResponse(result, options):
 
     elif options['out'] == 'chart':
         plotChartAndSaveToFile(result, options)
-
-    elif options['out'] == "df":
-        display(pandas.DataFrame(result['rows'], columns = result['columns']))
 
     else:
         dataframeToImage(pandas.DataFrame(result['rows'], columns = result['columns']), options)

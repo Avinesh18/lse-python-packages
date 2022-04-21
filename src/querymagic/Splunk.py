@@ -1,9 +1,9 @@
 import os
 import time
 from dotenv import load_dotenv
+import numpy as np
 import requests
 from http.client import HTTPException
-import numpy as np
 
 load_dotenv()
 _TOKEN = os.getenv("SPLUNK_TOKEN")

@@ -1,7 +1,7 @@
-from datetime import timedelta
 import os
 from dotenv import load_dotenv
 import numpy as np
+from datetime import timedelta
 from azure.kusto.data import KustoClient, KustoConnectionStringBuilder, ClientRequestProperties
 from azure.kusto.data.exceptions import KustoServiceError
 

@@ -1,12 +1,11 @@
 import os
+import threading
+import re
 from IPython.core.magic import register_cell_magic, Magics, magics_class, cell_magic, needs_local_scope
 from IPython.display import display
 from .Splunk import execute as splunk_execute
 from .Kusto import execute as kusto_execute
 from .FormatResponse import formatResponse
-import threading
-import pandas
-import re
 
 threadLock = threading.Lock()
 
