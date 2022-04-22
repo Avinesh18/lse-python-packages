@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 from pandas.plotting import table
 
 def dataframeToImage(df, options):
-    ax = plt.subplot(111, frame_on=False)
+    fig, ax = plt.subplots()
+    ax.set(frame_on = False)
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
 
@@ -19,7 +20,7 @@ def dataframeToImage(df, options):
     for cell_loc in cells:
         cells[cell_loc].set_text_props(verticalalignment = 'center', horizontalalignment = 'center')
 
-    plt.savefig(options['filename'] + ".png", bbox_inches = 'tight')
+    return fig
 
 def validDateString(string):
     try:
@@ -101,7 +102,7 @@ def formatRowsAndColumnsForPlotting(result, x_field, y_field):
     y_series = formatDataSeries(y_series, None if type(result['column_types']).__name__ == 'NoneType' else result['column_types'][y_field_index], False)
     return (x_series, y_series)
 
-def plotChartAndSaveToFile(result, options):
+def plotChart(result, options):
     chart_type = options['chart'] if 'chart' in options else 'linechart'
     x_field = None if not('x' in options) else options['x']
     y_field = None if not('y' in options) else options['y']
@@ -114,35 +115,38 @@ def plotChartAndSaveToFile(result, options):
 
     (x_series, y_series) = formatRowsAndColumnsForPlotting(result, x_field, y_field)
     
-    plt.figure(figsize = (10, 5), dpi = 80)
-    plt.xticks(rotation=70)
-    plt.grid(axis='y')
+    fig, ax = plt.subplots(figsize = (10, 5), dpi = 80)
 
     if chart_type == 'barchart':
-        plt.bar(x_series, y_series)
+        ax.bar(x_series, y_series)
     elif chart_type == 'piechart':
-        plt.pie(y_series, labels=x_series, startangle=90, autopct='%.1f%%')
+        ax.pie(y_series, labels=x_series, startangle=90, autopct='%.1f%%')
     elif chart_type == 'scatterplot':
-        plt.scatter(x_series, y_series)
+        ax.scatter(x_series, y_series)
     else:
-        plt.plot(x_series, y_series)
+        ax.plot(x_series, y_series)
+    
+    ax.tick_params(axis = 'x', labelrotation = 70)
+    ax.grid(axis='y')
 
-    plt.savefig(options['filename'] + ".png", bbox_inches = 'tight')
+    return fig
 
 def formatResponse(result, options):
-    print(options)
-    
+    fig = None
+
     if not('out' in options):
         display(pandas.DataFrame(result['rows'], columns = result['columns']))
 
     elif options['out'] == 'table':
-        dataframeToImage(pandas.DataFrame(result['rows'], columns = result['columns']), options)
+        fig = dataframeToImage(pandas.DataFrame(result['rows'], columns = result['columns']), options)
 
     elif options['out'] == "raw":
         display(result)
 
     elif options['out'] == 'chart':
-        plotChartAndSaveToFile(result, options)
+        fig = plotChart(result, options)
 
     else:
-        dataframeToImage(pandas.DataFrame(result['rows'], columns = result['columns']), options)
+        fig = dataframeToImage(pandas.DataFrame(result['rows'], columns = result['columns']), options)
+
+    return fig

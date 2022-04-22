@@ -10,10 +10,11 @@ from .FormatResponse import formatResponse
 threadLock = threading.Lock()
 
 class QueryResult:
-    def __init__(self, type=None, query=None, result=None):
+    def __init__(self, type=None, query=None, result=None, figures=None):
         self.__type = type
         self.__query = query
         self.__result = result
+        self.__figures = figures
 
     @property
     def type(self):
@@ -26,11 +27,16 @@ class QueryResult:
     @property
     def result(self):
         return self.__result
+
+    @property
+    def figures(self):
+        return self.__figures
     
-    def _set(self, type, query, result):
+    def _set(self, type, query, result, figures):
         self.__type = type
         self.__query = query
         self.__result = result
+        self.__figures = figures
 
 _last_query_result = QueryResult()
 
@@ -86,10 +92,10 @@ class QueryMagic(Magics):
                 print("ERROR:",e)
                 return
 
-            global _last_query_result
-            _last_query_result._set("splunk", substituted_string, result)
+            fig = [formatResponse(result, parameters)]
 
-            formatResponse(result, parameters)
+            global _last_query_result
+            _last_query_result._set("splunk", substituted_string, result, fig)
         finally:
             threadLock.release()
 
@@ -108,11 +114,12 @@ class QueryMagic(Magics):
                 print("ERROR:",e)
                 return
 
-            global _last_query_result
-            _last_query_result._set("kusto", substituted_string, result)
-
+            fig = []
             for i in range(len(result)):
-                formatResponse(result[i], parameters)
+                fig.append(formatResponse(result[i], parameters))
+
+            global _last_query_result
+            _last_query_result._set("kusto", substituted_string, result, fig)
         finally:
             threadLock.release()
 
