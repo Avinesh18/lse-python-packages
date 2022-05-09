@@ -92,7 +92,9 @@ class QueryMagic(Magics):
                 print("ERROR:",e)
                 return
 
-            fig = [formatResponse(result, parameters)]
+            fig = [None]
+            if len(result['rows']) != 0:
+                fig = [formatResponse(result, parameters)]
 
             global _last_query_result
             _last_query_result._set("splunk", substituted_string, result, fig)
@@ -116,7 +118,11 @@ class QueryMagic(Magics):
 
             fig = []
             for i in range(len(result)):
+                if len(result[i]['rows']) == 0:
+                    continue
                 fig.append(formatResponse(result[i], parameters))
+            if len(fig) == 0:
+                fig = [None]
 
             global _last_query_result
             _last_query_result._set("kusto", substituted_string, result, fig)

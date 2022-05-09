@@ -1,4 +1,5 @@
 import re
+from textwrap import wrap
 import pandas
 import numpy as np
 from IPython.display import display
@@ -96,8 +97,8 @@ def formatDataSeries(data, type, allow_string):
 def formatRowsAndColumnsForPlotting(result, x_field, y_field):
     x_field_index = np.where(result['columns'] == x_field)[0][0]
     y_field_index = np.where(result['columns'] == y_field)[0][0]
-    x_series = result['rows'][:, x_field_index]
-    y_series = result['rows'][:, y_field_index]
+    x_series = np.array(result['rows'])[:, x_field_index]
+    y_series = np.array(result['rows'])[:, y_field_index]
     x_series = formatDataSeries(x_series, None if type(result['column_types']).__name__ == 'NoneType' else result['column_types'][x_field_index], True)
     y_series = formatDataSeries(y_series, None if type(result['column_types']).__name__ == 'NoneType' else result['column_types'][y_field_index], False)
     return (x_series, y_series)
