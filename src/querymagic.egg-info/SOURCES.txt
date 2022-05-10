@@ -2,10 +2,12 @@ LICENSE
 README.md
 pyproject.toml
 setup.cfg
+src/querymagic/Chart.py
 src/querymagic/CustomMagics.py
 src/querymagic/FormatResponse.py
 src/querymagic/Kusto.py
 src/querymagic/Splunk.py
+src/querymagic/Table.py
 src/querymagic/Util.py
 src/querymagic/__init__.py
 src/querymagic.egg-info/PKG-INFO
