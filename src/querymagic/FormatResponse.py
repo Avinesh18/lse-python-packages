@@ -16,7 +16,7 @@ def formatResponse(result, options):
         display(pandas.DataFrame(result['rows'], columns = result['columns']))
 
     elif options['out'] == 'table':
-        fig = generateTable(pandas.DataFrame(result['rows'], columns = result['columns']), options)
+        fig = generateTable(result, options)
 
     elif options['out'] == "raw":
         display(result)
@@ -25,6 +25,6 @@ def formatResponse(result, options):
         fig = plotChart(result, options)
 
     else:
-        fig = generateTable(pandas.DataFrame(result['rows'], columns = result['columns']), options)
+        fig = generateTable(result, options)
 
     return fig

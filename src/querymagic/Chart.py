@@ -5,23 +5,7 @@ import pandas
 import re
 from .Table import generateTable
 
-def validateInputParameters(result, options):
-    x_name = None if not('x' in options) else options['x']
-    if not(x_name in result['columns']):
-        return False, "Invalid x parameter"
-
-    if 'y1' in options:
-        i = 1
-        while ('y' + str(i)) in options:
-            y_name = options['y' + str(i)]
-            if not(y_name in result['columns']):
-                return False, "Invalid y" + str(i) + " parameter"
-            i += 1
-    else:
-        y_name = None if not('y' in options) else options['y']
-        if y_name != None and not(x_name in result['columns']):
-            return False, "Invalid y paramter"
-    return True, ""
+count = 1
 
 def validDateString(string):
     try:
@@ -98,28 +82,46 @@ def getSeries(result, name, allow_string):
     index = np.where(result['columns'] == name)[0][0]
     series = np.array(result['rows'])[:, index]
     return formatDataSeries(series, None if type(result['column_types']).__name__ == 'NoneType' else result['column_types'][index], allow_string)
-    
+
+def validateInputParameters(result, options):
+    x_name = None if not('x' in options) else options['x']
+    if not(x_name in result['columns']):
+        return False, "Invalid x parameter"
+
+    if 'y1' in options:
+        i = 1
+        while ('y' + str(i)) in options:
+            y_name = options['y' + str(i)]
+            if not(y_name in result['columns']):
+                return False, "Invalid y" + str(i) + " parameter"
+            i += 1
+    else:
+        y_name = None if not('y' in options) else options['y']
+        if y_name != None and not(x_name in result['columns']):
+            return False, "Invalid y paramter"
+    return True, ""
+
 def plotChart(result, options):
     chart_type = options['chart'] if 'chart' in options else 'linechart'
     valid, comment = validateInputParameters(result, options)
     if not(valid):
         print(comment)
-        return generateTable(pandas.DataFrame(result['rows'], columns = result['columns']), options)
+        return generateTable(result, options)
 
     x_series = getSeries(result, options['x'], True)
 
     no_y_series = 0
     labels = []
+    y_series = []
     if not('y' in options):
         while 'y' + str(no_y_series+1) in options:
+            y_series.append(getSeries(result, options['y' + str(no_y_series + 1)], False))
             labels.append(options['y' + str(no_y_series + 1)])
             no_y_series+=1
     else:
         no_y_series = 1
+        y_series.append(getSeries(result, options['y'], False))
         labels.append(options['y'])
-    y_series = []
-    for i in range(no_y_series):
-        y_series.append(getSeries(result, options['y' + str(i+1)], False))
     
     fig, ax = plt.subplots(figsize = (10, 5), dpi = 80)
 
@@ -132,7 +134,7 @@ def plotChart(result, options):
 
     elif chart_type == 'scatterplot':
         for i in range(no_y_series):
-            ax.scatter(x_series, y_series[i])
+            ax.scatter(x_series, y_series[i], label = labels[i])
 
     else:
         for i in range(no_y_series):
@@ -142,4 +144,9 @@ def plotChart(result, options):
     ax.grid(axis='y')
     ax.legend(loc = 'upper right')
 
-    return fig
+    global count
+    filename = options['title'] if 'title' in options else 'chart' + str(count) + '.png'
+    count += 1 
+
+    fig.suptitle(options['title'] if 'title' in options else '')
+    fig.savefig(filename, bbox_inches = 'tight')
