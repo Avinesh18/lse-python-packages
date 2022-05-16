@@ -1,19 +1,20 @@
+import os
+import threading
+import re
 from IPython.core.magic import register_cell_magic, Magics, magics_class, cell_magic, needs_local_scope
 from IPython.display import display
 from .Splunk import execute as splunk_execute
 from .Kusto import execute as kusto_execute
 from .FormatResponse import formatResponse
-import threading
-import pandas
-import re
 
 threadLock = threading.Lock()
 
 class QueryResult:
-    def __init__(self, type=None, query=None, result=None):
+    def __init__(self, type=None, query=None, result=None, figures=None):
         self.__type = type
         self.__query = query
         self.__result = result
+        self.__figures = figures
 
     @property
     def type(self):
@@ -26,11 +27,16 @@ class QueryResult:
     @property
     def result(self):
         return self.__result
+
+    @property
+    def figures(self):
+        return self.__figures
     
-    def _set(self, type, query, result):
+    def _set(self, type, query, result, figures):
         self.__type = type
         self.__query = query
         self.__result = result
+        self.__figures = figures
 
 _last_query_result = QueryResult()
 
@@ -75,6 +81,8 @@ class QueryMagic(Magics):
     @cell_magic
     def splunk(self, line, cell, local_ns = None):
         parameters = parse_parameters(line)
+        parameters['filename'] = os.getenv('QUERYMAGIC_FILENAME')
+        parameters['filename'] = parameters['filename'] if parameters['filename'] != None else 'querymagic-image'
         substituted_string = add_substitutions(cell, local_ns)
         try:
             threadLock.acquire()
@@ -84,10 +92,12 @@ class QueryMagic(Magics):
                 print("ERROR:",e)
                 return
 
-            global _last_query_result
-            _last_query_result._set("splunk", substituted_string, result)
+            fig = [None]
+            if len(result['rows']) != 0:
+                fig = [formatResponse(result, parameters)]
 
-            display(formatResponse(result, parameters['out'] if 'out' in parameters else 'df'))
+            global _last_query_result
+            _last_query_result._set("splunk", substituted_string, result, fig)
         finally:
             threadLock.release()
 
@@ -95,6 +105,8 @@ class QueryMagic(Magics):
     @cell_magic
     def kusto(self, line, cell, local_ns = None):
         parameters = parse_parameters(line)
+        parameters['filename'] = os.getenv('QUERYMAGIC_FILENAME')
+        parameters['filename'] = parameters['filename'] if parameters['filename'] != None else 'querymagic-image'
         substituted_string = add_substitutions(cell, local_ns)
         try:
             threadLock.acquire()
@@ -104,11 +116,16 @@ class QueryMagic(Magics):
                 print("ERROR:",e)
                 return
 
-            global _last_query_result
-            _last_query_result._set("kusto", substituted_string, result)
-
+            fig = []
             for i in range(len(result)):
-                display(formatResponse(result[i], parameters['out'] if 'out' in parameters else 'df'))
+                if len(result[i]['rows']) == 0:
+                    continue
+                fig.append(formatResponse(result[i], parameters))
+            if len(fig) == 0:
+                fig = [None]
+
+            global _last_query_result
+            _last_query_result._set("kusto", substituted_string, result, fig)
         finally:
             threadLock.release()
 
