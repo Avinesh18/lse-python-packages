@@ -27,13 +27,13 @@ def getTexTable(rows, columns, title = ""):
     
     tex_table += indentation + "}\n\\hline\n"
     for i in range(len(columns) - 1):
-        tex_table += columns[i].replace("{", "\\{").replace("}", "\\}").replace(":", ": ").replace(",", ", ").replace("_", "\_") + " & "
-    tex_table += columns[len(columns) - 1] + " \\\\\n\\hline\\hline\n"
+        tex_table += str(columns[i]).replace("{", "\\{").replace("}", "\\}").replace(":", ": ").replace(",", ", ").replace("_", "\_") + " & "
+    tex_table += str(columns[len(columns) - 1]) + " \\\\\n\\hline\\hline\n"
     
     for row in rows:
         for i in range(len(row) - 1):
-            tex_table += row[i].replace("{", "\\{").replace("}", "\\}").replace(":", ": ").replace(",", ", ").replace("_", "\_") + " & "
-        tex_table += row[len(row) - 1] + " \\\\\\hline\n"
+            tex_table += str(row[i]).replace("{", "\\{").replace("}", "\\}").replace(":", ": ").replace(",", ", ").replace("_", "\_") + " & "
+        tex_table += str(row[len(row) - 1]) + " \\\\\\hline\n"
     tex_table += "\\hline\n\\end{tabulary}\n"
     tex_table += "\\caption{" + title + "}\n\\end{table}\n"
     tex_table += tex_end
