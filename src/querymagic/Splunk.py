@@ -38,8 +38,7 @@ def send_request(query):
         "id": searchId,
         "search": "search " + query,
         "max_count": _MAX_COUNT,
-        "status_buckets": _STATUS_BUCKETS,
-        "earliest_time": "-h"
+        "status_buckets": _STATUS_BUCKETS
     }
 
     r = requests.post(_SEARCH_URL, headers = basic_auth(_USERNAME, _PASSWORD), data = payload, verify = False)
