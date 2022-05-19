@@ -1,20 +1,20 @@
 import os
-import threading
-import re
 from IPython.core.magic import register_cell_magic, Magics, magics_class, cell_magic, needs_local_scope
 from IPython.display import display
 from .Splunk import execute as splunk_execute
 from .Kusto import execute as kusto_execute
 from .FormatResponse import formatResponse
+import threading
+import pandas
+import re
 
 threadLock = threading.Lock()
 
 class QueryResult:
-    def __init__(self, type=None, query=None, result=None, figures=None):
+    def __init__(self, type=None, query=None, result=None):
         self.__type = type
         self.__query = query
         self.__result = result
-        self.__figures = figures
 
     @property
     def type(self):
@@ -27,16 +27,11 @@ class QueryResult:
     @property
     def result(self):
         return self.__result
-
-    @property
-    def figures(self):
-        return self.__figures
     
-    def _set(self, type, query, result, figures):
+    def _set(self, type, query, result):
         self.__type = type
         self.__query = query
         self.__result = result
-        self.__figures = figures
 
 _last_query_result = QueryResult()
 
@@ -89,15 +84,14 @@ class QueryMagic(Magics):
             try:
                 result = splunk_execute(substituted_string)
             except Exception as e:
-                print("ERROR:",e)
+                print("ERROR: ", e)
                 return
 
-            fig = [None]
             if len(result['rows']) != 0:
-                fig = [formatResponse(result, parameters)]
+                formatResponse(result, parameters)
 
             global _last_query_result
-            _last_query_result._set("splunk", substituted_string, result, fig)
+            _last_query_result._set("splunk", substituted_string, result)
         finally:
             threadLock.release()
 
@@ -113,19 +107,15 @@ class QueryMagic(Magics):
             try:
                 result = kusto_execute(substituted_string)
             except Exception as e:
-                print("ERROR:",e)
+                print("ERROR: ", e)
                 return
 
-            fig = []
             for i in range(len(result)):
-                if len(result[i]['rows']) == 0:
-                    continue
-                fig.append(formatResponse(result[i], parameters))
-            if len(fig) == 0:
-                fig = [None]
+                if len(result[i]['rows']) != 0:
+                    formatResponse(result[i], parameters)
 
             global _last_query_result
-            _last_query_result._set("kusto", substituted_string, result, fig)
+            _last_query_result._set("kusto", substituted_string, result)
         finally:
             threadLock.release()
 

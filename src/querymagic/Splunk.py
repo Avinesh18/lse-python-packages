@@ -38,7 +38,8 @@ def send_request(query):
         "id": searchId,
         "search": "search " + query,
         "max_count": _MAX_COUNT,
-        "status_buckets": _STATUS_BUCKETS
+        "status_buckets": _STATUS_BUCKETS,
+        "earliest_time": "-24h"
     }
 
     r = requests.post(_SEARCH_URL, headers = basic_auth(_USERNAME, _PASSWORD), data = payload, verify = False)
@@ -47,7 +48,7 @@ def send_request(query):
         return searchId
     else:
         print(r.reason)
-        raise HTTPException("Splunk service returned status code: " + str(r.status_code))
+        raise HTTPException("Splunk service returned status code: " + str(r.status_code) + " while sending request")
 
 
 def get_status(search_id):
@@ -57,7 +58,7 @@ def get_status(search_id):
         json_response = r.json()
         return (json_response['entry'][0]['content']['doneProgress'], json_response['entry'][0]['content']['dispatchState'])
     else:
-        raise HTTPException("Splunk service returned status code: " + str(r.status_code))
+        raise HTTPException("Splunk service returned status code: " + str(r.status_code) + " while getting status")
 
 def fetch_result(search_id):
     r = requests.get(_SEARCH_URL + "/{}/results".format(search_id), headers = basic_auth(_USERNAME, _PASSWORD), verify = False, params = { 
@@ -67,7 +68,7 @@ def fetch_result(search_id):
     if r.status_code == 200:
         return r.json()
     else:
-        raise HTTPException("Splunk service returned status code: " + str(r.status_code))
+        raise HTTPException("Splunk service returned status code: " + str(r.status_code) + " while fetching result")
 
 def execute(query):
     search_id = send_request(query)
