@@ -76,8 +76,6 @@ class QueryMagic(Magics):
     @cell_magic
     def splunk(self, line, cell, local_ns = None):
         parameters = parse_parameters(line)
-        parameters['filename'] = os.getenv('QUERYMAGIC_FILENAME')
-        parameters['filename'] = parameters['filename'] if parameters['filename'] != None else 'querymagic-image'
         substituted_string = add_substitutions(cell, local_ns)
         try:
             threadLock.acquire()
@@ -99,8 +97,6 @@ class QueryMagic(Magics):
     @cell_magic
     def kusto(self, line, cell, local_ns = None):
         parameters = parse_parameters(line)
-        parameters['filename'] = os.getenv('QUERYMAGIC_FILENAME')
-        parameters['filename'] = parameters['filename'] if parameters['filename'] != None else 'querymagic-image'
         substituted_string = add_substitutions(cell, local_ns)
         try:
             threadLock.acquire()

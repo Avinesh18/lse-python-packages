@@ -1,12 +1,4 @@
-import matplotlib.pyplot as plt
-import pandas
-from pandas.plotting import table
-
-MAX_CHARACTERS_IN_ONE_LINE = 30
 count = 1
-
-def break_text_into_lines(text):
-    return '\n'.join(text[i:i+MAX_CHARACTERS_IN_ONE_LINE] for i in range(0, len(text), MAX_CHARACTERS_IN_ONE_LINE))
 
 def getTexTable(rows, columns, title = ""):
     tex_begin = """\\documentclass[landscape]{article}
