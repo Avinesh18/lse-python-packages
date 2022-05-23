@@ -63,4 +63,4 @@ def save_figure(fig, filename = "", **kwargs):
         print("Invalid Filename")
         return
 
-    fig.savefig(filename, kwargs)
+    fig.savefig(filename, **kwargs)
