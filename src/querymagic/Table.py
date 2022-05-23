@@ -1,3 +1,5 @@
+from .Util import valid_filename
+
 count = 1
 
 def getTexTable(rows, columns, title = ""):
@@ -34,11 +36,20 @@ def getTexTable(rows, columns, title = ""):
 
 def generateTable(result, options):
     global count
-    title = options['title'] if 'title' in options else 'table' + str(count)
+    title = None
+    if 'title' in options:
+        title = options['title']
+    else:
+        title = 'table' + str(count)
+        count += 1
+
     tex_source = getTexTable(result['rows'], result['columns'], title)
 
-    filename = "table" + str(count) + ".tex"
-    count += 1
+    if valid_filename(title):
+        filename = title + '.tex'
+    else:
+        filename = 'table' + str(count) + '.tex'
+        count += 1
     try:
         f = open(filename, "w")
         f.write(tex_source)

@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from dateutil.parser import parse
-import pandas
 import re
+from .Util import valid_filename
 
 count = 1
 
@@ -12,7 +12,7 @@ class ChartProperties:
 def getProperties(options):
     chart_properties = ChartProperties()
     chart_properties.x = options['x'] if 'x' in options else None
-    chart_properties.type = options['chart'] if 'chart' in options else 'linechart'
+    chart_properties.type = options['type'] if 'type' in options else 'linechart'
     chart_properties.group = options['groupBy'] if 'groupBy' in options else None
     chart_properties.title = options['title'] if 'title' in options else ''
 
@@ -249,6 +249,9 @@ def plotChart(result, options):
     fig.suptitle(properties.title)
 
     global count
-    filename = 'chart' + str(count) + ".png"
-    count += 1
+    if properties.title != '' and valid_filename(properties.title):
+        filename = properties.title + '.png'
+    else:
+        filename = 'chart' + str(count) + '.png'
+        count += 1
     fig.savefig(filename, bbox_inches = 'tight')
