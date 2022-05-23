@@ -1,5 +1,3 @@
-from .Table import getTexTable
-
 count = 1000
 
 def save_text(text):
@@ -35,6 +33,7 @@ def valid_filename(filename):
     return True
 
 def save_table(rows, columns, title, filename=""):
+    from .Table import getTexTable
     tex_source = getTexTable(rows, columns, title)
 
     global count
