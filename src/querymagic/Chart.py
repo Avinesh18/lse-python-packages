@@ -138,7 +138,7 @@ def getGroupedSeries(result, properties):
             groups[group] = [[x_series[i], result['rows'][i][y_index]]]
 
     series = []
-    for group in groups.keys:
+    for group in groups.keys():
         group_series = groups[group]
         if x_type != 'real' and x_type != 'datetime':
             formatted_y, _ = formatSeries(matrixColumn(group_series, 1), y_type)
