@@ -114,11 +114,11 @@ def matrixColumn(array, index):
     return [array[i][index] for i in range(len(array))]
 
 def getGroupedSeries(result, properties):
-    if not(columnExists(properties.x)):
+    if not(columnExists(result, properties.x)):
         return None, "Invlaid x parameter"
-    if not(columnExists(properties.y[0])):
+    if not(columnExists(result, properties.y[0])):
         return None, "Invalid y parameter"
-    if not(columnExists(properties.group)):
+    if not(columnExists(result, properties.group)):
         return None, "Invalid groupBy parameter"
 
     x_series, x_type = getSeries(result, properties.x)
