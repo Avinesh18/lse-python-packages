@@ -239,7 +239,7 @@ def plotChart(result, options):
 
     else:
         for element in series:
-            ax.plot(element[0], element[1], label = element[2])
+            ax.plot(element[0], element[1], label = element[2], marker = 'o')
 
     ax.tick_params(axis = 'x', labelrotation = 70)
     ax.grid(axis = 'y')
